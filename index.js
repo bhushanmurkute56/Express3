@@ -1,7 +1,11 @@
 import express from "express";
 const app = express();
+import dotenv from "dotenv";
+import cors from "cors";
 
+dotenv.config();
 app.use(express.json());
+app.use(cors());
 
 const TODOs = [
     {
@@ -22,6 +26,13 @@ const TODOs = [
     }
 ];
 
+app.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "Server is up and running"
+  });
+});
+
 app.get("/todos", (req, res) => {
     res.json({
             success: true,
@@ -34,11 +45,11 @@ app.post("/todos", (req, res) => {
   const { todoItem, priority, emoji, isDone } = req.body;
 
   const todoObj = {
-    id : Math.floor(Math.random() * 10000),
-    todoItem : todoItem,
-    priority : priority,
-    emoji : emoji,
-    isDone : isDone,
+    id : Math.floor(Math.random() * 10000) || 1,
+    todoItem,
+    priority,
+    emoji,
+    isDone,
     createdAt : new Date().toISOString()
   };
 
@@ -70,7 +81,6 @@ app.get("/todos/:id", (req, res) => {
         message: "TODO item not found"
     });
   }});
-
   app.delete("/todos/:id", (req, res) => {
     const { id} = req.params;
     const index = TODOs.findIndex((item) => item.id == id);
@@ -144,6 +154,8 @@ app.get("/todos/:id", (req, res) => {
         message: "TODO item updated successfully"
       });
     });
-app.listen(8080, () => {
-  console.log("Server is running on port 8080");
+
+    const PORT = process.env.PORT || 5003;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
